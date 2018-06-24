@@ -1,0 +1,48 @@
+#!/bin/bash -e
+#
+# S2I assemble script for the 's2i-zuul-dashboard' image.
+# The 'assemble' script builds your application source so that it is ready to run.
+#
+# For more information refer to the documentation:
+#	https://github.com/openshift/source-to-image/blob/master/docs/builder_image.md
+#
+
+set -e
+
+shopt -s dotglob
+
+# If the 's2i-zuul-dashboard' assemble script is executed with the '-h' flag, print the usage.
+if [[ "$1" == "-h" ]]; then
+	exec ${STI_SCRIPTS_PATH}/usage
+fi
+
+# Restore artifacts from the previous build (if they exist).
+#
+if [ "$(ls /tmp/artifacts/ 2>/dev/null)" ]; then
+  echo "---> Restoring build artifacts..."
+  mv -v /tmp/artifacts/. $HOME/.
+fi
+
+echo "---> Installing application source..."
+cp -Rf /tmp/src/. ./
+
+ZUUL_GITHUB_REPO="https://github.com/openstack-infra/zuul.git"
+ZUUL_DIR=zuul
+git clone -v -b ${ZUUL_BASE_REVISION:-3.1.0} ${ZUUL_SRC_URL:-$ZUUL_GITHUB_REPO} ${ZUUL_DIR}
+
+echo "---> Building application from source..."
+# TODO: Add build steps for your application, eg npm install, bundle install, pip install, etc.
+pushd ${ZUUL_DIR}
+
+#tools/install-js-tools.sh
+yarn install
+npm run build
+
+tar -xvf zuul-web.tgz -C ${APP_ROOT}/static_html
+popd
+
+# We do not need zuul dir, it just consumes space
+rm -rf ${ZUUL_DIR}
+
+# set permissions for any installed artifacts
+fix-permissions /opt/app-root

@@ -25,7 +25,7 @@ LABEL io.k8s.description="Platform for building Zuul Scheduler" \
 
 # TODO: Install required packages here: required for pip install
 RUN INSTALL_PKGS="python3 python3-devel python3-setuptools python3-pip \
-    python3-virtualenv re2-devel" && \
+    python3-virtualenv re2-devel nss_wrapper" && \
     dnf -y --setopt=tsflags=nodocs install $INSTALL_PKGS && \
     rpm -V $INSTALL_PKGS && \
     dnf -y clean all --enablerepo='*'

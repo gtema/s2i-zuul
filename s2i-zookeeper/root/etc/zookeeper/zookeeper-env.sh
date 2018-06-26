@@ -13,8 +13,8 @@
 
 ZK_USER=${ZK_USER:-"1001"}
 ZK_LOG_LEVEL=${ZK_LOG_LEVEL:-"INFO"}
-ZK_DATA_DIR=${ZK_DATA_DIR:-"/opt/app-root/data"}
-ZK_DATA_LOG_DIR=${ZK_DATA_LOG_DIR:-"/opt/app-root/datalog"}
+ZK_DATA_DIR=${ZK_DATA_DIR:-"/opt/app-root/data/data"}
+ZK_DATA_LOG_DIR=${ZK_DATA_LOG_DIR:-"/opt/app-root/data/log"}
 ZK_LOG_DIR=${ZK_LOG_DIR:-"/opt/app-root/log"}
 ZK_CONF_DIR=${ZK_CONF_DIR:-"/opt/app-root/conf"}
 ZK_CLIENT_PORT=${ZK_CLIENT_PORT:-2181}

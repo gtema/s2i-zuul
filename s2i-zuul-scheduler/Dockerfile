@@ -47,9 +47,9 @@ COPY ./root/ /
 #   installation.
 # - In order to drop the root user, we have to make some directories world
 #   writable as OpenShift default security model is to run the container
-#   under random UID.
+#   under random UID. Zuul directories are created with 775 to give root group rwx
 RUN virtualenv-$PYTHON_VERSION ${APP_ROOT} && \
-    mkdir -m 755 -p /etc/zuul /var/run/zuul /var/lib/zuul /var/log/zuul && \
+    mkdir -m 775 -p /etc/zuul /var/run/zuul /var/lib/zuul /var/log/zuul && \
     chown -R 1001:0 /etc/zuul /var/run/zuul /var/lib/zuul /var/log/zuul && \
     chown -R 1001:0 ${APP_ROOT} && \
     fix-permissions ${APP_ROOT} -P

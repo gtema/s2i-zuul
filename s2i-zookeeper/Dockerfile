@@ -26,7 +26,8 @@ COPY ./s2i/bin/ $STI_SCRIPTS_PATH
 COPY ./root/ /
 
 # TODO: Drop the root user and make the content of /opt/app-root owned by user 1001
-RUN chown -R 1001:1001 ${APP_ROOT}
+RUN chown -R 1001:0 ${APP_ROOT} && \
+    fix-permissions ${APP_ROOT} -P
 
 # This default user is created in the s2i-base image
 USER 1001

@@ -1,0 +1,2 @@
+ZUUL_BASE_REVISION=3.1.0
+ZUUL_SRC_URL=https://github.com/openstack-infra/zuul.git

@@ -1,0 +1,5 @@
+elements-dir: /etc/nodepool/elements
+images-dir: /opt/nodepool/images
+
+zookeeper-servers:
+  - host: localhost

@@ -42,7 +42,7 @@ Make sure that all of the scripts are executable by running *chmod +x s2i/bin/**
 #### Create the builder image
 The following command will create a builder image named s2i-python-container based on the Dockerfile that was created previously.
 ```
-docker build -t s2i-zuul-web .
+docker build -t s2i-nodepool-builder .
 ```
 The builder image can also be created by using the *make* command since a *Makefile* is included.
 
@@ -51,8 +51,8 @@ Once the image has finished building, the command *s2i usage s2i-python-containe
 #### Testing the builder image
 The builder image can be tested using the following commands:
 ```
-docker build -t s2i-zuul-web-candidate .
-IMAGE_NAME=s2i-zuul-web-candidate test/run
+docker build -t s2i-nodepool-builder-candidate .
+IMAGE_NAME=s2i-nodepool-builder-candidate test/run
 ```
 The builder image can also be tested by using the *make test* command since a *Makefile* is included.
 
@@ -60,7 +60,7 @@ The builder image can also be tested by using the *make test* command since a *M
 The application image combines the builder image with your applications source code, which is served using whatever application is installed via the *Dockerfile*, compiled using the *assemble* script, and run using the *run* script.
 The following command will create the application image:
 ```
-s2i build test/test-app s2i-zuul-web s2i-zuul-web-app
+s2i build test/test-app s2i-nodepool-builder s2i-nodepool-builder-app
 ---> Building and installing application from source...
 ```
 Using the logic defined in the *assemble* script, s2i will now create an application image using the builder image as a base and including the source code from the test/test-app directory.
@@ -68,14 +68,13 @@ Using the logic defined in the *assemble* script, s2i will now create an applica
 #### Running the application image
 Running the application image is as simple as invoking the docker run command:
 ```
-docker run -d -p 9000:9000 --net=host s2i-zuul-web-app
+docker run -it --net=host s2i-nodepool-builder-app
 ```
-The application, which consists of a simple static web page, should now be accessible at  [http://localhost:8080](http://localhost:8080).
 
 #### Using the saved artifacts script
 Rebuilding the application using the saved artifacts can be accomplished using the following command:
 ```
-s2i build --incremental=true test/test-app s2i-zuul-web scheduler-app
+s2i build --incremental=true test/test-app s2i-nodepool-builder scheduler-app
 ---> Restoring build artifacts...
 ---> Building and installing application from source...
 ```

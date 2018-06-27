@@ -1,0 +1,2 @@
+NODEPOOL_BASE_REVISION=3.0.1
+NODEPOOL_SRC_URL=https://github.com/openstack-infra/nodepool.git

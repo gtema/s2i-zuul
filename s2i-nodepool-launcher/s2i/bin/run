@@ -1,6 +1,6 @@
 #!/bin/bash -e
 #
-# S2I run script for the 's2i-zuul-executor' image.
+# S2I run script for the 's2i-nodepool-launcher' image.
 # The run script executes the server that runs your application.
 #
 # For more information see the documentation:
@@ -11,6 +11,4 @@ source /opt/app-root/etc/generate_container_user
 
 set -e
 
-#TODO: import keys stored as secrets (mount as separate dir)
-
-exec zuul-executor -d
+exec nodepool-launcher -d

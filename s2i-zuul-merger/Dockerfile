@@ -18,16 +18,14 @@ ENV NAME=python3 \
     RELEASE=1 \
     ARCH=x86_64
 
-LABEL io.k8s.description="Platform for building Zuul Web" \
-      io.k8s.display-name="Builder Zuul Web F28" \
+LABEL io.k8s.description="Platform for building Zuul Merger" \
+      io.k8s.display-name="Builder Zuul Merger F28" \
       io.openshift.expose-services="" \
-      io.openshift.tags="builder,zuul,web,0.1.0"
+      io.openshift.tags="builder,zuul,merger,0.1.0"
 
 # TODO: Install required packages here: required for pip install
-RUN curl --silent --location https://dl.yarnpkg.com/rpm/yarn.repo | tee /etc/yum.repos.d/yarn.repo
-
 RUN INSTALL_PKGS="python3 python3-devel python3-setuptools python3-pip \
-    python3-virtualenv re2-devel nss_wrapper npm tree yarn" && \
+    python3-virtualenv re2-devel nss_wrapper" && \
     dnf -y --setopt=tsflags=nodocs install $INSTALL_PKGS && \
     rpm -V $INSTALL_PKGS && \
     dnf -y clean all --enablerepo='*'
@@ -53,9 +51,6 @@ RUN virtualenv-$PYTHON_VERSION ${APP_ROOT} && \
 
 # This default user is created in the s2i-base image
 USER 1001
-
-# TODO: Set the default port for applications built using this image - web
-EXPOSE 9000
 
 # Set the default CMD to print the usage of the language image.
 CMD $STI_SCRIPTS_PATH/usage

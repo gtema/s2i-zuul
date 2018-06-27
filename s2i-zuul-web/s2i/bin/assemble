@@ -80,6 +80,13 @@ if [[ -f setup.py && -z "$DISABLE_SETUP_PY_PROCESSING" ]]; then
   pip install .
 fi
 
+# Build static assets
+yarn install
+npm run build
+
+mkdir -p -m 775 ${APP_ROOT}/static_html
+tar -xvf zuul-web.tgz -C ${APP_ROOT}/static_html
+
 rm -rf .git
 popd
 

@@ -24,8 +24,10 @@ LABEL io.k8s.description="Platform for building Zuul Executor" \
       io.openshift.tags="builder,zuul,executor,0.1.0"
 
 # TODO: Install required packages here: required for pip install
+RUN curl --silent --location https://dl.yarnpkg.com/rpm/yarn.repo | tee /etc/yum.repos.d/yarn.repo
+
 RUN INSTALL_PKGS="python3 python3-devel python3-setuptools python3-pip \
-    python3-virtualenv re2-devel nss_wrapper" && \
+    python3-virtualenv re2-devel nss_wrapper npm tree yarn" && \
     dnf -y --setopt=tsflags=nodocs install $INSTALL_PKGS && \
     rpm -V $INSTALL_PKGS && \
     dnf -y clean all --enablerepo='*'

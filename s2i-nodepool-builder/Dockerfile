@@ -36,6 +36,9 @@ default ALL=(ALL) NOPASSWD:ALL\n\
 Defaults:default !requiretty'\
 > /etc/sudoers.d/default
 
+RUN curl -s http://cdn-fastly.deb.debian.org/debian/pool/main/q/qemu/qemu_2.12+dfsg-3.debian.tar.xz | \
+  tar xJvf - --strip-components=1 -C /usr/local/bin debian/qemu-debootstrap
+
 
 # TODO: Copy the S2I scripts to $STI_SCRIPTS_PATH, since s2i-base image
 # sets io.openshift.s2i.scripts-url label that way, or update that label

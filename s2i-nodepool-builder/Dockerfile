@@ -26,7 +26,7 @@ LABEL io.k8s.description="Platform for building Nodepool Bulder" \
 # TODO: Install required packages here: required for pip install
 RUN INSTALL_PKGS="python3 python3-devel python3-setuptools python3-pip \
     python3-virtualenv re2-devel nss_wrapper \
-    sudo qemu-img debootstrap yum-utils" && \
+    sudo qemu-img debootstrap yum-utils e2fsprogs kpartx" && \
     dnf -y --setopt=tsflags=nodocs install $INSTALL_PKGS && \
     rpm -V $INSTALL_PKGS && \
     dnf -y clean all --enablerepo='*'

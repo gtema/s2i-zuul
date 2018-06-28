@@ -12,6 +12,6 @@ source /opt/app-root/etc/generate_container_user
 set -e
 
 # Ensure working directories are there
-mkdir -p /opt/nodepool/{images,cache,tmp}
+mkdir -p -m 775 /opt/nodepool/{images,cache,tmp}
 
 exec nodepool-builder -d

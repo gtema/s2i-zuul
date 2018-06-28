@@ -91,7 +91,14 @@ if [[ -f "secure.conf" ]]; then
   cp secure.conf /etc/nodepool/secure.conf
 fi
 if [[ -f "logging.conf" ]]; then
-  cp secure.conf /etc/nodepool/secure.conf
+  cp logging.conf /etc/nodepool/logging.conf
+fi
+
+if [[ -d "elements" ]]; then
+  # Copy DIB elements into $APP_ROOT and fix permissions (ensure +x)
+  mkdir -p $APP_ROOT/dib/elements
+  cp -av elements $APP_ROOT/dib
+  grep -rl '^#!/.*' $APP_ROOT/dib/elements | xargs chmod u+x
 fi
 
 # set permissions for any installed artifacts

@@ -83,5 +83,16 @@ fi
 rm -rf .git
 popd
 
+echo "---> Installing provisioned application parts ..."
+if [[ -f "zuul.conf" ]]; then
+  cp zuul.conf /etc/zuul/zuul.conf
+fi
+if [[ -f "main.yaml" ]]; then
+  cp main.yaml /etc/zuul/main.yaml
+fi
+if [[ -f "logging.conf" ]]; then
+  cp logging.conf /etc/zuul/logging.conf
+fi
+
 # set permissions for any installed artifacts
 fix-permissions /opt/app-root

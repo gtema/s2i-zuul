@@ -28,7 +28,7 @@ cid_file=$($MKTEMP_EXEC -u --suffix=.cid)
 s2i_args="--pull-policy=never --loglevel=2"
 
 # Port the image exposes service to be tested
-test_port=2181
+test_port=4730
 
 image_exists() {
   docker inspect $1 &>/dev/null
@@ -73,7 +73,7 @@ prepare() {
 }
 
 run_test_application() {
-  docker run --rm --cidfile=${cid_file} -p ${test_port} ${IMAGE_NAME}-testapp
+  docker run --rm --cidfile=${cid_file} -p ${test_port} --net=host ${IMAGE_NAME}-testapp
 }
 
 cleanup() {
@@ -120,23 +120,19 @@ test_usage() {
 }
 
 test_connection() {
-  echo "Testing HTTP connection (http://$(container_ip):$(container_port))"
+  echo "Testing connection (127.0.0.1:$(container_port))"
   local max_attempts=10
   local sleep_time=1
   local attempt=1
   local result=1
   while [ $attempt -le $max_attempts ]; do
-    echo "Sending GET request to http://$(container_ip):$(container_port)/"
-    response_code=$(curl -s -w %{http_code} -o /dev/null http://$(container_ip):$(container_port)/)
+    echo "Sending empty request to 127.0.0.1:$(container_port)/"
+    response_code=$(echo '' | nc 127.0.0.1 $(container_port))
     status=$?
     if [ $status -eq 0 ]; then
-      if [ "$response_code" == "imok" ]; then
-        echo -e "\033[32mZookeeper server is running, :-)\033[0m"
-        result=0
-      else
-        echo -e "\033[31mZookeeper server is not running, :-(\033[0m"
-      fi
-      break
+      result=0
+    else
+      echo "returned $response_code, status=$status"
     fi
     attempt=$(( $attempt + 1 ))
     sleep $sleep_time

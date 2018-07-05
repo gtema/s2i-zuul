@@ -9,6 +9,6 @@
 #
 pushd ${APP_ROOT} >/dev/null
 
-tar cf - {bin,etc,include,lib,lib64}
+tar --ignore-failed-read -cO {bin,etc,include,lib,lib64,\.status}
 
 popd >/dev/null

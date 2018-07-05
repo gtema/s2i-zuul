@@ -32,13 +32,6 @@ RUN INSTALL_PKGS="python3 python3-devel python3-setuptools python3-pip \
     rpm -V $INSTALL_PKGS && \
     dnf -y clean all --enablerepo='*'
 
-# TODO: Copy the S2I scripts to $STI_SCRIPTS_PATH, since s2i-base image
-# sets io.openshift.s2i.scripts-url label that way, or update that label
-COPY ./s2i/bin/ $STI_SCRIPTS_PATH
-
-# Copy extra files to the image.
-COPY ./root/ /
-
 # - Create a Python virtual environment for use by any application to avoid
 #   potential conflicts with Python packages preinstalled in the main Python
 #   installation.
@@ -50,6 +43,13 @@ RUN virtualenv-$PYTHON_VERSION ${APP_ROOT} && \
     chown -R 1001:0 /etc/zuul /var/run/zuul /var/lib/zuul /var/log/zuul && \
     chown -R 1001:0 ${APP_ROOT} && \
     fix-permissions ${APP_ROOT} -P
+
+
+# Copy S2I scripts and extra files to the image.
+COPY ./root/ /
+COPY ./s2i/bin/ $STI_SCRIPTS_PATH
+
+RUN chown -R 1001:0 ${APP_ROOT} && fix-permissions ${APP_ROOT} -P
 
 # This default user is created in the s2i-base image
 USER 1001

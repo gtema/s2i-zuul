@@ -48,10 +48,21 @@ fi
 
 echo "---> Installing application source..."
 cp -Rf /tmp/src/. ./
+STATUS_FILE=$APP_ROOT/.status
 
 NODEPOOL_GITHUB_REPO="https://github.com/openstack-infra/nodepool.git"
 NODEPOOL_DIR=nodepool
-git clone -v -b ${NODEPOOL_BASE_REVISION:-3.0.1} ${NODEPOOL_SRC_URL:-$NODEPOOL_GITHUB_REPO} ${NODEPOOL_DIR}
+CHECKOUT_REVISION=${NODEPOOL_BASE_REVISION:-3.0.1}
+
+if [[ -f ${STATUS_FILE} ]]; then
+  source ${STATUS_FILE}
+  if [[ "${LAST_REVISION}" == "${CHECKOUT_REVISION}" ]]; then
+    echo "No changes required"
+    exit 0
+  fi
+fi
+
+git clone -v -b ${CHECKOUT_REVISION} ${NODEPOOL_SRC_URL:-$NODEPOOL_GITHUB_REPO} ${NODEPOOL_DIR}
 
 if [[ ! -z "$UPGRADE_PIP_TO_LATEST" ]]; then
   echo "---> Upgrading pip to latest version ..."
@@ -72,6 +83,9 @@ elif [[ -f "${NODEPOOL_DIR}/requirements.txt" ]]; then
   pip install -r ${NODEPOOL_DIR}/requirements.txt
 fi
 
+# NOTE(gtema): downgrade diskimage-builder due to https://bugs.launchpad.net/diskimage-builder/+bug/1779273
+pip install diskimage-builder==2.6.1
+
 echo "---> Building application from source..."
 # TODO: Add build steps for your application, eg npm install, bundle install, pip install, etc.
 pushd ${NODEPOOL_DIR}
@@ -84,6 +98,31 @@ fi
 rm -rf .git
 popd
 
+echo "---> Patching diskimage-builder ..."
+# For some reason sometimes empty image created is not flushed on the disk before
+# losetup tries to "mount" it. Therefore it fails. Adding extra flush helps
+cat > patch << EOF
+*** /opt/app-root/lib/python3.6/site-packages/diskimage_builder/block_device/level0/localloop.py        2018-06-28 18:18:42.160079515 +0000
+--- /opt/app-root/lib/python3.6/site-packages/diskimage_builder/block_device/level0/localloop.py        2018-06-28 18:22:55.705390138 +0000
+***************
+*** 31,36 ****
+--- 31,37 ----
+      with open(filename, "w") as fd:
+          fd.seek(size - 1)
+          fd.write("\0")
++         fd.flush()
+
+
+  def image_delete(filename):
+EOF
+
+# Patch or silently ignore
+patch -Nt /opt/app-root/lib/python3.6/site-packages/diskimage_builder/block_device/level0/localloop.py patch  || :
+
+rm -f patch /opt/app-root/lib/python3.6/site-packages/diskimage_builder/block_device/level0/localloop.py.rej
+
+
+echo "---> Installing provisioned application parts ..."
 if [[ -f "nodepool.yaml" ]]; then
   cp nodepool.yaml /etc/nodepool/nodepool.yaml
 fi

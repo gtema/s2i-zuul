@@ -1,5 +1,25 @@
-elements-dir: /etc/nodepool/elements
+#elements-dir: /etc/nodepool/elements
 images-dir: /opt/nodepool/images
+build-log-dir: /opt/nodepool/logs/builds
 
 zookeeper-servers:
   - host: localhost
+
+labels:
+  - name: fedora-28
+
+diskimages:
+  - name: fedora-28
+    pause: false
+    elements:
+      - fedora-minimal
+      - disable-selinux
+    release: 28
+    env-vars:
+      TMPDIR: /opt/nodepool/tmp
+      DIB_CHECKSUM: '1'
+      DIB_IMAGE_CACHE: /opt/nodepool/cache
+      QEMU_IMG_OPTIONS: compat=0.10
+      DIB_GRUB_TIMEOUT: '0'
+      GIT_HTTP_LOW_SPEED_TIME: '300'
+      GIT_HTTP_LOW_SPEED_LIMIT: '1000'

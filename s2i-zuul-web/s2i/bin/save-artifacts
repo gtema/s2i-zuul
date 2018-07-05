@@ -7,8 +7,8 @@
 # For more information see the documentation:
 #	https://github.com/openshift/source-to-image/blob/master/docs/builder_image.md
 #
-pushd ${HOME} >/dev/null
+pushd ${APP_ROOT} >/dev/null
 
-# tar cf - /opt/app-root
+tar --ignore-failed-read -cO {bin,etc,include,lib,lib64,static_html,src/zuul/node_modules,\.status}
 
 popd >/dev/null

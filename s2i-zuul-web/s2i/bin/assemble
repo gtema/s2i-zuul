@@ -42,15 +42,32 @@ fi
 #
 if [ "$(ls /tmp/artifacts/ 2>/dev/null)" ]; then
   echo "---> Restoring build artifacts..."
-  mv -v /tmp/artifacts/. $HOME/.
+  cp -a /tmp/artifacts/. $APP_ROOT
+  rm -rf /tmp/artifacts/
 fi
 
 echo "---> Installing application source..."
 cp -Rf /tmp/src/. ./
+STATUS_FILE=$APP_ROOT/.status
 
 ZUUL_GITHUB_REPO="https://github.com/openstack-infra/zuul.git"
 ZUUL_DIR=zuul
-git clone -v -b ${ZUUL_BASE_REVISION:-3.1.0} ${ZUUL_SRC_URL:-$ZUUL_GITHUB_REPO} ${ZUUL_DIR}
+CHECKOUT_REVISION=${ZUUL_BASE_REVISION:-3.1.0}
+
+if [[ -f ${STATUS_FILE} ]]; then
+  source ${STATUS_FILE}
+  if [[ "${LAST_REVISION}" == "${CHECKOUT_REVISION}" ]]; then
+    echo "No changes required"
+    exit 0
+  fi
+fi
+
+tee -a ${STATUS_FILE} <<EOF
+LAST_REVISION=${CHECKOUT_REVISION}
+EOF
+
+git clone -v -b ${CHECKOUT_REVISION} ${ZUUL_SRC_URL:-$ZUUL_GITHUB_REPO} ${ZUUL_DIR}
+
 
 if [[ ! -z "$UPGRADE_PIP_TO_LATEST" ]]; then
   echo "---> Upgrading pip to latest version ..."

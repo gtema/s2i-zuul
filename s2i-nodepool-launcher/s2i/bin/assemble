@@ -48,10 +48,21 @@ fi
 
 echo "---> Installing application source..."
 cp -Rf /tmp/src/. ./
+STATUS_FILE=$APP_ROOT/.status
 
 NODEPOOL_GITHUB_REPO="https://github.com/openstack-infra/nodepool.git"
 NODEPOOL_DIR=nodepool
-git clone -v -b ${NODEPOOL_BASE_REVISION:-3.0.1} ${NODEPOOL_SRC_URL:-$NODEPOOL_GITHUB_REPO} ${NODEPOOL_DIR}
+CHECKOUT_REVISION=${NODEPOOL_BASE_REVISION:-3.0.1}
+
+if [[ -f ${STATUS_FILE} ]]; then
+  source ${STATUS_FILE}
+  if [[ "${LAST_REVISION}" == "${CHECKOUT_REVISION}" ]]; then
+    echo "No changes required"
+    exit 0
+  fi
+fi
+
+git clone -v -b ${CHECKOUT_REVISION} ${NODEPOOL_SRC_URL:-$NODEPOOL_GITHUB_REPO} ${NODEPOOL_DIR}
 
 if [[ ! -z "$UPGRADE_PIP_TO_LATEST" ]]; then
   echo "---> Upgrading pip to latest version ..."
